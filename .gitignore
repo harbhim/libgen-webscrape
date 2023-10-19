@@ -1,2 +1,6 @@
 .venv/
+__pycache__/
+*.cpython/
+
+books/
 notes.txt

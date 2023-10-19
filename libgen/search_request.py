@@ -1,8 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-from manager.manage import settings
-from .url_builder import URLBuilder
+from .url_builder import URLBehavior
 
 # WHY
 # The SearchRequest module contains all the internal logic for the library.
@@ -33,10 +32,8 @@ class SearchRequest:
         "Edit",
     ]
 
-    def __init__(self, query, search_type="title"):
-        self.query = query
-        self.search_type = search_type.lower()
-        self.url = URLBuilder(query, search_type).get_url_filtered()
+    def __init__(self, url: str):
+        self.url = url
 
     def strip_i_tag_from_soup(self, soup):
         subheadings = soup.find_all("i")

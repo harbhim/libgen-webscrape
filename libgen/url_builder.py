@@ -1,21 +1,30 @@
-from manager.manage import settings
+from pydantic import BaseModel, Field, PositiveInt
+
+from core.manage import settings
 
 
-class URLBuilder:
-    def __init__(self, query: str, field: str="title"):
-        self.base_url: str = settings.get("BASE_URL","")
-        self.query = "%20".join(query.split(" "))
-        self.field = field
+class URLData(BaseModel):
+    query: str
+    field: str = Field(default="title")
+    record_count: PositiveInt = Field(default=25)
+    sort: str = Field(default="year")
+    sortmode: str = Field(default="DESC")
 
-        if len(self.query) < 3:
-            raise ValueError("The length of search query must be grater than 3")
+
+class URLBehavior:
+    def __init__(self, url_data: URLData):
+        self.base_url = settings.get("BASE_URL")
+        self.url_data = url_data
+
+        if len(self.url_data.query) < 3:
+            raise ValueError("The length of search query must be greater than 3")
 
     def get_url_unfiltered(self):
-        return f"{self.base_url}/search.php?req={self.query}&column={self.field}"
-
-    def get_url_filtered(self, field: str="year", mode: str="DESC"):
-        url = self.get_url_unfiltered()
-        url = f"{url}&sort={field}&sortmode={mode}"
+        query = self.url_data.query.replace(" ", "%20")
+        url = f"{self.base_url}/search.php?req={query}&res={self.url_data.record_count}&column={self.url_data.field}"
         return url
 
-        
+    def get_url_filtered(self):
+        url = self.get_url_unfiltered()
+        url = f"{url}&sort={self.url_data.sort}&sortmode={self.url_data.sortmode}"
+        return url
