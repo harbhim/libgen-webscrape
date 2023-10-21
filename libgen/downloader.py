@@ -11,15 +11,17 @@ HEADERS_CHOOSER = {
     "Cloudflare": settings.get("cloudflare_headers"),
 }
 
+DOWNLOAD_SEQUENCE = ["GET", "IPFS.io", "Cloudflare"]
+
 
 class Downloader:
-    def _download_file(self, book):
+    def _download_file(self, book: dict):
         if book is not None:
             try:
-                for _type, link in book.links.items():
+                for i in DOWNLOAD_SEQUENCE:
                     response = requests.get(
-                        link,
-                        headers=HEADERS_CHOOSER.get(_type),
+                        book["links"].get(i),
+                        headers=HEADERS_CHOOSER.get(i),
                         stream=True,
                     )
 
@@ -29,13 +31,14 @@ class Downloader:
                         )
                         file_size = int(response.headers.get("content-length", 0))
 
-                        path = f"./books/{book.title}.{book.extension}"
+                        path = f"./books/{book['title']}.{book['extension']}"
                         with open(path, "wb") as file, tqdm(
-                            desc=f"Downloading {book.title}",
+                            desc=f"Downloading {book['title']}",
                             total=file_size,
                             unit="B",
                             unit_scale=True,
                             unit_divisor=1024,
+                            dynamic_ncols=True,
                         ) as bar:
                             for data in response.iter_content(chunk_size=1024):
                                 file.write(data)

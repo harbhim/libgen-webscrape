@@ -1,7 +1,6 @@
 import time
 import requests
 from concurrent import futures
-from collections import namedtuple
 from bs4 import BeautifulSoup
 
 from core.manage import settings
@@ -9,9 +8,6 @@ from core.manage import settings
 MIRROR_SOURCES = ["GET", "Cloudflare", "IPFS.io"]
 EXTENSIONS = ["pdf", "epub"]
 LANGUAGES = ["English", "english"]
-
-
-Book = namedtuple("Book", ["id", "title", "url", "extension", "links"])
 
 
 class DownloadLinks:
@@ -40,8 +36,13 @@ class DownloadLinks:
                 soup = BeautifulSoup(page.text, "html.parser")
                 links = soup.find_all("a", string=MIRROR_SOURCES)
                 download_links = {link.string: link["href"] for link in links}
-                b = Book(book[0], book[1], book[2], book[3], download_links)
-                return b
+                return {
+                    "id": book[0],
+                    "title": book[1],
+                    "url": book[2],
+                    "extension": book[3],
+                    "links": download_links,
+                }
 
             except requests.exceptions.RequestException as e:
                 print(f"Request failed: {e}")
