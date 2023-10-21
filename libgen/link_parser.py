@@ -6,8 +6,7 @@ from bs4 import BeautifulSoup
 
 from core.manage import settings
 
-MIRROR_SOURCES = ["GET", "Cloudflare", "IPFS.io", "Infura"]
-# MIRROR_SOURCES = ["GET"]
+MIRROR_SOURCES = ["GET", "Cloudflare", "IPFS.io"]
 EXTENSIONS = ["pdf", "epub"]
 LANGUAGES = ["English", "english"]
 

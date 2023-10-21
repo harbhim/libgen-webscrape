@@ -1,41 +1,51 @@
 import os
 import requests
-import time
 from concurrent import futures
 from tqdm import tqdm
 
 from core.manage import settings
+
+HEADERS_CHOOSER = {
+    "IPFS.io": settings.get("ipfs_headers"),
+    "GET": settings.get("get_headers"),
+    "Cloudflare": settings.get("cloudflare_headers"),
+}
 
 
 class Downloader:
     def _download_file(self, book):
         if book is not None:
             try:
-                response = requests.get(
-                    book.links["IPFS.io"],
-                    headers=settings.get("download_file_headers"),
-                    stream=True,
-                )
+                for _type, link in book.links.items():
+                    response = requests.get(
+                        link,
+                        headers=HEADERS_CHOOSER.get(_type),
+                        stream=True,
+                    )
 
-                if response.status_code == 200:
-                    os.makedirs(settings.get("DOWNLOAD_PATH", "./books"), exist_ok=True)
-                    file_size = int(response.headers.get("content-length", 0))
+                    if response.status_code == 200:
+                        os.makedirs(
+                            settings.get("DOWNLOAD_PATH", "./books"), exist_ok=True
+                        )
+                        file_size = int(response.headers.get("content-length", 0))
 
-                    path = f"./books/{book.title}.{book.extension}"
-                    with open(path, "wb") as file, tqdm(
-                        desc="Downloading",
-                        total=file_size,
-                        unit="B",
-                        unit_scale=True,
-                        unit_divisor=1024,
-                    ) as bar:
-                        for data in response.iter_content(chunk_size=1024):
-                            file.write(data)
-                            bar.update(len(data))
+                        path = f"./books/{book.title}.{book.extension}"
+                        with open(path, "wb") as file, tqdm(
+                            desc=f"Downloading {book.title}",
+                            total=file_size,
+                            unit="B",
+                            unit_scale=True,
+                            unit_divisor=1024,
+                        ) as bar:
+                            for data in response.iter_content(chunk_size=1024):
+                                file.write(data)
+                                bar.update(len(data))
 
-                    print("File downloaded successfully")
-                else:
-                    print("Error: Unable to download file")
+                        print("File downloaded successfully")
+                        break
+
+                    else:
+                        continue
             except requests.exceptions.RequestException as e:
                 print(f"Error: {e}")
             except Exception as e:
