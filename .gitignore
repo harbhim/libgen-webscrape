@@ -2,6 +2,8 @@
 *.cpython/
 *.pyc
 .vscode/
+__pycache__
+__pycache__/
 
 books/
 notes.txt
