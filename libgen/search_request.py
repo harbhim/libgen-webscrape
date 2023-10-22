@@ -1,17 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 
-from .url_builder import URLBehavior
-
-# WHY
-# The SearchRequest module contains all the internal logic for the library.
-#
-# This encapsulates the logic,
-# ensuring users can work at a higher level of abstraction.
-
-# USAGE
-# req = search_request.SearchRequest("[QUERY]", search_type="[title]")
-
 
 class SearchRequest:
     col_names = [
@@ -49,15 +38,8 @@ class SearchRequest:
         soup = BeautifulSoup(search_page.text, "lxml")
         self.strip_i_tag_from_soup(soup)
 
-        # Libgen results contain 3 tables
-        # Table2: Table of data to scrape.
-        # print(soup.find_all("table"))
         information_table = soup.find_all("table")[2]
 
-        # Determines whether the link url (for the mirror)
-        # or link text (for the title) should be preserved.
-        # Both the book title and mirror links have a "title" attribute,
-        # but only the mirror links have it filled.(title vs title="libgen.io")
         raw_data = [
             [
                 td.a["href"]

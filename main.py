@@ -1,9 +1,9 @@
 import argparse
-from libgen.link_parser import DownloadLinks
 
 from libgen.url_builder import URLData, URLBehavior
 from libgen.search_request import SearchRequest
 from libgen.downloader import Downloader
+from libgen.link_parser import DownloadLinks
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-title", "--title", help="Title")
@@ -24,7 +24,6 @@ def get_kwargs(args):
 
 
 kwargs = get_kwargs(args)
-print(kwargs)
 
 if kwargs is not None:
     url_data = URLData(**kwargs)
